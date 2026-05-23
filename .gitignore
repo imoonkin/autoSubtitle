@@ -1,0 +1,6 @@
+/models
+/llama
+*.mp3
+*.wav
+/__pycache__
+/gui/__pycache__

@@ -1,0 +1,16 @@
+[project]
+name = "autosubtitle"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "numpy>=2.4.6",
+    "onnxruntime>=1.26.0",
+    "pyaudiowpatch>=0.2.12.8",
+    "pyside6>=6.11.1",
+    "pyside6-fluent-widgets[full]>=1.11.2",
+    "scipy>=1.17.1",
+    "tomli-w>=1.2.0",
+]

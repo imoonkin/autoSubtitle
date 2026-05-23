@@ -1,0 +1,20 @@
+[models.vad]
+model_path = "models/silero_vad.onnx"
+threshold = 0.50
+max_speech_duration_s = 10
+max_silence_chunks = 25
+
+[models.llm]
+# 核心可执行文件与模型路径
+exe_path = "llama/llama-server.exe"
+model_path = "models/Qwen3-ASR-0.6B-Q8_0.gguf"
+mmproj_path = "models/mmproj-Qwen3-ASR-0.6B-Q8_0.gguf"
+
+# 服务器网络配置
+host = "127.0.0.1"
+port = "8080"
+
+# 运行推理超参数
+ngl = "99"           # GPU 卸载层数 (如使用 Vulkan/CUDA 加速)
+ctx_size = "4096"     # 上下文窗口大小
+parallel = "1"       # 并发处理槽数
