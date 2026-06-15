@@ -14,26 +14,34 @@ class FloatingSubtitleView(QWidget):
                             Qt.WindowType.WindowStaysOnTopHint | 
                             Qt.WindowType.Tool)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        
+        self.setSizePolicy(self.sizePolicy().Policy.Preferred, self.sizePolicy().Policy.Expanding)
         # 内部字幕文本
         self.layout = QVBoxLayout(self)
         self.label = SubtitleLabel("等待语音输入...", self)
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label.setWordWrap(True)
         self.layout.addWidget(self.label)
         
-        # 初始化样式
+        # 初始化样式与拖拽状态
         self.update_style(32, "#FFFFFF", 150) # 默认大小、白色、半透明背景
-        self.resize(900, 120)
+        self.setFixedWidth(900) 
+        self.adjustSize()
+        self.m_drag = False
+        self.m_DragPosition = None
 
     def update_style(self, size, color_hex, bg_alpha):
         # 动态修改字体大小与颜色
-        self.label.setFont(QFont("Microsoft YaHei", size, QFont.Weight.Bold))
+        self.label.setFont(QFont("Microsoft YaHei", size))
         self.label.setStyleSheet(f"color: {color_hex};")
         # 动态修改悬浮窗背景板底色与透明度
         self.setStyleSheet(f"background-color: rgba(0, 0, 0, {bg_alpha}); border-radius: 10px;")
 
     def set_text(self, text):
         self.label.setText(text)
+        self.setMinimumHeight(0)
+        self.label.ensurePolished()
+        self.layout.activate()
+        self.adjustSize()
 
     # 支持鼠标按住拖动悬浮窗位置
     def mousePressEvent(self, event):
@@ -43,7 +51,7 @@ class FloatingSubtitleView(QWidget):
             event.accept()
 
     def mouseMoveEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton and self.m_drag:
+        if event.buttons() == Qt.MouseButton.LeftButton and self.m_drag:
             self.move(event.globalPosition().toPoint() - self.m_DragPosition)
             event.accept()
 

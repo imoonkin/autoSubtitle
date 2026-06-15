@@ -3,7 +3,7 @@ import wave
 import base64
 import httpx
 import json
-
+import re
 def pcm_to_wav_bytes(pcm_bytes, sample_rate=16000) -> bytes:
     wav_io = io.BytesIO()
     with wave.open(wav_io, 'wb') as wav_file:
@@ -79,7 +79,8 @@ def process_and_translate_audio(raw_audio_bytes, sample_rate=16000, llm_config=N
                 except Exception:
                     pass
                     
-        return full_text.strip()
+        clean_text = re.sub(r"^language.+?<asr_text>", "", full_text).strip()
+        return clean_text
         
     except httpx.RequestError as exc:
         print(f"❌ [API] Connection error: {exc}")
