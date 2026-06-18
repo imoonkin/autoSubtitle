@@ -1,15 +1,11 @@
 """后台字幕处理线程。
-
-从原 coordinator.py 中提取。由 SubtitleController 管理生命周期。
 """
 import queue
 import pyaudiowpatch as pyaudio
-import callModel
-from audio_processor import AudioSliceProcessor, TARGET_SAMPLE_RATE
+from backend.audio_processor import AudioSliceProcessor, TARGET_SAMPLE_RATE
 from PySide6.QtCore import QThread, Signal
 
-from backend.audio import init_resources
-
+from backend.init import init_resources
 
 class SubtitleWorker(QThread):
     text_ready = Signal(str)
@@ -22,7 +18,7 @@ class SubtitleWorker(QThread):
 
     def run(self):
         self.running = True
-        self.status_changed.emit("正在拉起模型服务与音频设备...")
+        self.status_changed.emit("初始化...")
 
         try:
             p, ort_session, speakers, hw_rate = init_resources(self.config)
