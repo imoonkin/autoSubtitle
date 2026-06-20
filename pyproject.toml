@@ -7,10 +7,12 @@ requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
     "numpy>=2.4.6",
-    "onnxruntime>=1.26.0",
+    "onnxruntime==1.26.0",
     "pyaudiowpatch>=0.2.12.8",
     "pyside6>=6.11.1",
     "pyside6-fluent-widgets[full]>=1.11.2",
+    "requests>=2.34.2",
     "scipy>=1.17.1",
+    "sherpa-onnx>=1.13.3",
     "tomli-w>=1.2.0",
 ]

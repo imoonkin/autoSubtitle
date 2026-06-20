@@ -2,9 +2,9 @@
 
 暴露为 QML 上下文属性 "subtitleController"。
 """
-from PySide6.QtCore import QObject, Property, Signal, Slot
+from PySide6.QtCore import QObject, Property, Signal
 
-from backend.config import load_config_dict
+from config import load_config_dict
 from backend.worker import SubtitleWorker
 
 
@@ -37,7 +37,6 @@ class SubtitleController(QObject):
 
     # ── slots ───────────────────────────────────────────────────────────
 
-    @Slot()
     def startService(self):
         if self._worker is not None:
             return
@@ -54,7 +53,6 @@ class SubtitleController(QObject):
         self._worker.start()
         self._set_running(True)
 
-    @Slot()
     def stopService(self):
         if self._worker is None:
             return

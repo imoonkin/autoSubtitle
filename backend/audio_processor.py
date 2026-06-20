@@ -1,4 +1,7 @@
+"""音频切片与 VAD 处理器。"""
+import os
 import numpy as np
+import onnxruntime as ort
 from scipy.signal import resample_poly
 
 TARGET_SAMPLE_RATE = 16000
@@ -6,12 +9,32 @@ SILERO_CHUNK_SAMPLES = 512
 SILERO_CHUNK_BYTES = SILERO_CHUNK_SAMPLES * 2
 
 class AudioSliceProcessor:
-    def __init__(self, ort_session, hardware_sample_rate, vad_config):
-        self.ort_session = ort_session
+    def __init__(self, current_dir: str, hardware_sample_rate: int, vad_config: dict):
+        """
+        在类内部自主初始化 Silero VAD 模型与 ONNXRuntime 会话
+        """
         self.hardware_sample_rate = hardware_sample_rate
         self.one_second_hardware_bytes = hardware_sample_rate * 2
         
-        # 🌟 从外部配置动态加载参数
+        # 1. 模型路径解析与安全检查
+        conf_model_path = vad_config.get("model_path", "models/silero_vad.onnx")
+        vad_model_path = os.path.abspath(os.path.join(current_dir, conf_model_path)) if not os.path.isabs(conf_model_path) else conf_model_path
+        
+        if not os.path.exists(vad_model_path):
+            raise FileNotFoundError(f"❌ VAD 引擎未找到模型文件: {vad_model_path}")
+            
+        # 2. 自主配置并初始化 ONNX Runtime Session
+        opts = ort.SessionOptions()
+        opts.inter_op_num_threads = 1
+        opts.intra_op_num_threads = 1
+        self.ort_session = ort.InferenceSession(
+            vad_model_path, 
+            sess_options=opts, 
+            providers=["CPUExecutionProvider"]
+        )
+        print(f"🧠 [Silero ONNX v5] VAD 会话在类内部加载成功: {vad_model_path}")
+        
+        # 3. 加载动态阈值与控制参数
         self.vad_threshold = vad_config.get("threshold", 0.50)
         self.max_speech_duration_s = vad_config.get("max_speech_duration_s", 10)
         self.max_silence_chunks = vad_config.get("max_silence_chunks", 25)
@@ -34,6 +57,7 @@ class AudioSliceProcessor:
         self.state = np.zeros((2, 1, 128), dtype=np.float32)
 
     def process_chunk(self, chunk):
+        # ...（此处完全保留你原本高效的 while 循环与切片状态机代码，无需更改）...
         self.raw_processing_buffer.extend(chunk)
         
         if len(self.raw_processing_buffer) < self.one_second_hardware_bytes:
@@ -71,7 +95,6 @@ class AudioSliceProcessor:
             
             self.state = np.array(next_state, dtype=np.float32)
             
-            # 使用动态阈值
             if speech_prob >= self.vad_threshold:
                 self.silence_counter = 0
                 if not self.is_speaking:
@@ -90,7 +113,6 @@ class AudioSliceProcessor:
             
             should_trigger_llm = False
             
-            # 使用动态断句红线和时限
             if self.is_speaking and self.silence_counter >= self.max_silence_chunks:
                 print("🛑 [VAD] 检测到预设长尾静音，断句成功！准备交由大模型...")
                 should_trigger_llm = True
