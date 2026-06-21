@@ -1,15 +1,11 @@
-from urllib.parse import urljoin
-import requests
+import httpx
 
-class HttpTranslator:
+class TranslateClient:
     def __init__(self, trans_config: dict):
-        self.server_url = trans_config.get("server_url", "http://127.0.0.1")
-
+        self.server_url = trans_config.get("server_url")
         self.tgt_lang = trans_config.get("tgt_lang", "English")
         self.temperature = trans_config.get("temperature", 0.3)
         
-        print(f"✅ 翻译服务器 URL: {self.server_url}")  # 调试输出
-
     def translate(self, text: str) -> str:
         if not text:
             return ""
@@ -26,11 +22,11 @@ class HttpTranslator:
         }
         
         try:
-            response = requests.post(self.server_url, json=payload, timeout=5)
+            response = httpx.post(self.server_url, json=payload, timeout=5.0)
             if response.status_code == 200:
                 result = response.json()
                 return result["choices"][0]["message"]["content"].strip()
             else:
                 return f"[翻译错误: HTTP {response.status_code}]"
-        except requests.RequestException as e:
+        except httpx.RequestError as e:
             return f"[翻译通信断开: {e}]"

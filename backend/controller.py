@@ -47,8 +47,8 @@ class SubtitleController(QObject):
             return
 
         self._worker = SubtitleWorker(data)
-        self._worker.text_ready.connect(self._on_text_ready)
-        self._worker.status_changed.connect(self._on_status_changed)
+        self._worker.TextReady.connect(self._on_text_ready)
+        self._worker.StatusChanged.connect(self._on_status_changed)
         self._worker.finished.connect(self._on_finished)
         self._worker.start()
         self._set_running(True)

@@ -15,9 +15,17 @@ Window {
     height: Math.max(latestLabel.implicitHeight + 30, 100)  // 确保最小高度
 
     // ── Public properties ──────────────────────────────────────────────────
-    property int    fontSize: 32
+    property int    fontSize: initialFontSize
     property string fontColor: "#FFFFFF"
     property int    bgAlpha:  140
+
+    Connections {
+        target: subtitleController
+        function onTextReady(msg){
+            addText(msg)
+        }
+    }
+
 
     // ── Subtitle queue (max 3) ─────────────────────────────────────────────
     property var subtitleTexts: []
@@ -25,7 +33,7 @@ Window {
     function addText(text) {
         console.log("添加字幕:", text);  // 添加调试输出
         subtitleTexts.push(text);
-        if (subtitleTexts.length > 3)
+        if (subtitleTexts.length > 2)
             subtitleTexts.shift();
         refreshLabels();
     }
@@ -41,12 +49,6 @@ Window {
             history1Label.visible = true;
         } else {
             history1Label.visible = false;
-        }
-        if (len >= 3) {
-            history2Label.text = subtitleTexts[len - 3];
-            history2Label.visible = true;
-        } else {
-            history2Label.visible = false;
         }
         Qt.callLater(reAnchor);
     }
@@ -111,41 +113,6 @@ Window {
             anchors.bottom: parent.bottom
             anchors.margins: 0
             spacing: dragArea.containsMouse ? 4 : 0
-
-            // ── History label 2 (oldest) ───────────────────────────────────
-            // ── History label 2 (oldest) ───────────────────────────────────
-            Rectangle {
-                id: history2Bg
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: dragArea.containsMouse && history2Label.visible
-                        ? history2Label.implicitHeight + 20 : 0
-                color: dragArea.containsMouse
-                    ? Qt.rgba(0, 0, 0, bgAlpha * 0.75 / 255)
-                    : "transparent"
-                radius: 8
-                clip: true
-
-                Behavior on height { NumberAnimation { duration: 200 } }
-                Behavior on color  { ColorAnimation  { duration: 200 } }
-
-                Text {
-                    id: history2Label
-                    anchors.centerIn: parent
-                    anchors.verticalCenterOffset: 0
-                    width: parent.width - 28
-                    color: dragArea.containsMouse
-                        ? Qt.rgba(1, 1, 1, 130/255)
-                        : "transparent"
-                    font.pointSize: dragArea.containsMouse ? fontSize * 0.75 : 12  // ← 改为 12
-                    font.family: "Microsoft YaHei"
-                    wrapMode: Text.WordWrap
-                    visible: text !== "" && text !== undefined
-
-                    Behavior on font.pointSize { NumberAnimation { duration: 200 } }
-                    Behavior on color          { ColorAnimation  { duration: 200 } }
-                }
-            }
 
             // ── History label 1 ───────────────────────────────────────────
             Rectangle {

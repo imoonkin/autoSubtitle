@@ -1,5 +1,5 @@
 [gui]
-font_size = 22
+font_size = 12
 
 [models.vad]
 model_path = "../ModelsAI/silero_vad.onnx"
@@ -8,16 +8,21 @@ max_silence_chunks = 25
 max_speech_duration_s = 10
 
 [models.asr]
-model_path = "../ModelsAI/sherpa sense voice/model.int8.onnx"
-tokens_path = "../ModelsAI/sherpa sense voice/tokens.txt"
-num_threads = 4
-use_gpu = false
+bootstrap_server = true
+server_bin_path = "../llama/llama-server.exe"
+model_path = "../ModelsAI/Qwen3-ASR-0.6B-Q8_0.gguf"
+proj_path = "../ModelsAI/mmproj-Qwen3-ASR-0.6B-Q8_0.gguf"
+server_url = "http://127.0.0.1:8080/v1/chat/completions"
+threads = 2
+n_gpu_layers = 99
+
 
 [models.translate]
-use_local_server = true
+bootstrap_server = true
 server_bin_path = "../llama/llama-server.exe"
 model_path = "../ModelsAI/Qwen3-0.6B-abliterated.Q8_0.gguf"
-server_url = "http://127.0.0.1:8080/v1/chat/completions"
-threads = 1
-tgt_lang = "Chinese"
+server_url = "http://127.0.0.1:8081/v1/chat/completions"
+threads = 2
+n_gpu_layers = 99
 temperature = 0.3
+tgt_lang = "Chinese"

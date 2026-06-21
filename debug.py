@@ -17,7 +17,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
 # 导入你的 AsrProcessor
-from backend.asr_processor import AsrProcessor
+from backend.asr_client import AsrClient
 
 def load_audio_file(file_path: str, target_sample_rate: int = 16000) -> np.ndarray:
     """
@@ -100,7 +100,7 @@ def resample_audio(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarra
         return resampled.astype(np.float32)
 
 
-def test_asr_file(file_path: str, asr_processor: AsrProcessor, show_details: bool = True):
+def test_asr_file(file_path: str, asr_processor: AsrClient, show_details: bool = True):
     """
     测试单个音频文件
     
@@ -153,7 +153,7 @@ def test_asr_file(file_path: str, asr_processor: AsrProcessor, show_details: boo
         return None
 
 
-def test_multiple_files(asr_processor: AsrProcessor, audio_dir: str, extensions: list = ['.wav']):
+def test_multiple_files(asr_processor: AsrClient, audio_dir: str, extensions: list = ['.wav']):
     """
     测试目录下的多个音频文件
     
@@ -219,7 +219,7 @@ def main():
     print("=" * 70)
     
     try:
-        asr_processor = AsrProcessor(current_dir, asr_config)
+        asr_processor = AsrClient(current_dir, asr_config)
     except Exception as e:
         print(f"❌ 初始化失败: {e}")
         return
